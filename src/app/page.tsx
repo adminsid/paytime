@@ -14,21 +14,11 @@ export default async function Home() {
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-blue-50 to-white">
       <header className="flex items-center justify-between border-b border-blue-100 px-6 py-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600">
-            <svg
-              className="h-5 w-5 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-              />
-            </svg>
-          </div>
+          <img
+            src="/icon-192.png"
+            alt="Paytime Logo"
+            className="h-8 w-8 rounded-lg object-cover border border-blue-100 shadow-sm"
+          />
           <span className="text-xl font-bold text-gray-900">Paytime</span>
         </div>
         <div className="flex items-center gap-3">

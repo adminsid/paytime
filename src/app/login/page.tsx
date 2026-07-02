@@ -39,21 +39,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link href="/" className="mb-6 inline-flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600">
-              <svg
-                className="h-6 w-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                />
-              </svg>
-            </div>
+            <img
+              src="/icon-192.png"
+              alt="Paytime Logo"
+              className="h-10 w-10 rounded-xl object-cover border border-blue-100 shadow-sm"
+            />
             <span className="text-2xl font-bold text-gray-900">Paytime</span>
           </Link>
           <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
