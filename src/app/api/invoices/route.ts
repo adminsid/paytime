@@ -50,7 +50,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const [start, end] = [new Date(startDate), new Date(endDate)]
+    const start = new Date(startDate)
+    const end = new Date(endDate)
+    // Treat the end date as end-of-day in UTC so the full chosen day is included
+    end.setUTCHours(23, 59, 59, 999)
 
     const timeLogs = await prisma.timeLog.findMany({
       where: {
@@ -58,7 +61,7 @@ export async function POST(request: NextRequest) {
         companyId,
         isRunning: false,
         startTime: { gte: start },
-        endTime: { lte: new Date(`${endDate}T23:59:59.999Z`) },
+        endTime: { lte: end },
       },
     })
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { endOfMonth, format, startOfMonth } from 'date-fns'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 interface CompanyMember {
   companyId: string
@@ -39,6 +39,7 @@ export default function ReportsPage() {
   const [endDate, setEndDate] = useState(format(endOfMonth(new Date()), 'yyyy-MM-dd'))
   const [summary, setSummary] = useState<ReportSummary | null>(null)
   const [loading, setLoading] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     const loadCompanies = async () => {
@@ -83,31 +84,6 @@ export default function ReportsPage() {
     void loadMembers()
   }, [activeMembership?.role, selectedCompany])
 
-  const fetchReport = useCallback(async () => {
-    if (!selectedCompany) {
-      return
-    }
-
-    setLoading(true)
-    const params = new URLSearchParams({ companyId: selectedCompany })
-    if (startDate) {
-      params.set('startDate', startDate)
-    }
-    if (endDate) {
-      params.set('endDate', endDate)
-    }
-    if (selectedUser) {
-      params.set('userId', selectedUser)
-    }
-
-    const response = await fetch(`/api/reports?${params.toString()}`)
-    if (response.ok) {
-      const data = (await response.json()) as { summary: ReportSummary }
-      setSummary(data.summary)
-    }
-    setLoading(false)
-  }, [endDate, selectedCompany, selectedUser, startDate])
-
   useEffect(() => {
     if (!selectedCompany) {
       return
@@ -143,7 +119,7 @@ export default function ReportsPage() {
     return () => {
       active = false
     }
-  }, [endDate, selectedCompany, selectedUser, startDate])
+  }, [endDate, selectedCompany, selectedUser, startDate, refreshKey])
 
   const formatHours = (minutes: number) => {
     const hours = Math.floor(minutes / 60)
@@ -206,7 +182,7 @@ export default function ReportsPage() {
           />
         </div>
         <button
-          onClick={() => void fetchReport()}
+          onClick={() => setRefreshKey((k) => k + 1)}
           className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
         >
           Generate

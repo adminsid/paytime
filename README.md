@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Paytime
 
-## Getting Started
+A simple, self-hostable time tracking app for global virtual assistants.
 
-First, run the development server:
+## Features
+
+- ⏱ **Live Timer** — Start/stop tracking with break support and live elapsed display
+- 🏢 **Multi-Company** — Create or join companies; admins approve member requests
+- 💰 **Hourly Rates** — Set your rate and currency per company
+- 📄 **Auto Invoices** — Generate invoices from time logs; track draft → sent → paid
+- 📊 **Reports** — Filter work sessions by date range, user, and company
+- 🔐 **Auth** — Email/password authentication with JWT sessions
+- 📱 **PWA** — Installable as a Progressive Web App on any device
+- 🐳 **Self-hostable** — SQLite database, runs anywhere with Docker
+
+## Quick Start
+
+### Development
 
 ```bash
+# 1. Install dependencies
+npm install
+
+# 2. Copy and configure environment variables
+cp .env.example .env
+# Edit .env and set NEXTAUTH_SECRET to a long random string
+
+# 3. Create the database and run migrations
+npx prisma migrate dev
+
+# 4. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Production with Docker
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Copy and configure environment variables
+cp .env.example .env
+# Set NEXTAUTH_SECRET and NEXTAUTH_URL in .env
 
-## Learn More
+# Build and start
+docker-compose up -d
+```
 
-To learn more about Next.js, take a look at the following resources:
+The app will be available at `http://localhost:3000` with SQLite data persisted in a Docker volume.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment Variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Description | Example |
+|---|---|---|
+| `DATABASE_URL` | SQLite file path | `file:./dev.db` |
+| `NEXTAUTH_SECRET` | Secret for signing JWTs (use a long random string) | `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | Public URL of the app | `http://localhost:3000` |
 
-## Deploy on Vercel
+> **PostgreSQL**: To use PostgreSQL instead of SQLite, change `DATABASE_URL` to a Postgres connection string and update `provider` in `prisma/schema.prisma` from `sqlite` to `postgresql`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Tech Stack
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Framework**: [Next.js 14](https://nextjs.org) (App Router)
+- **Database**: SQLite via [Prisma ORM](https://prisma.io)
+- **Auth**: [NextAuth.js](https://next-auth.js.org)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com)
+- **Language**: TypeScript
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api/           # API routes (auth, companies, timelogs, invoices, reports)
+│   ├── dashboard/     # Protected app pages (timer, logs, reports, invoices, companies)
+│   ├── login/         # Login page
+│   └── register/      # Registration page
+├── components/        # Shared UI components (DashboardNav)
+├── lib/               # Prisma client, NextAuth options
+└── types/             # TypeScript type extensions
+prisma/
+├── schema.prisma      # Database schema
+└── migrations/        # Migration history
+```
