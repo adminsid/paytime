@@ -31,27 +31,23 @@ export async function POST(request: NextRequest) {
 
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    const user = await prisma.$transaction(async (tx) => {
-      const u = await tx.user.create({
-        data: { name, email, password: hashedPassword },
-        select: { id: true, name: true, email: true },
-      })
-
-      if (companyToJoin) {
-        await tx.companyMember.create({
-          data: {
-            userId: u.id,
-            companyId: companyToJoin.id,
-            role: 'member',
-            status: 'pending',
-          },
-        })
-      }
-
-      return u
+    const u = await prisma.user.create({
+      data: { name, email, password: hashedPassword },
+      select: { id: true, name: true, email: true },
     })
 
-    return NextResponse.json({ user }, { status: 201 })
+    if (companyToJoin) {
+      await prisma.companyMember.create({
+        data: {
+          userId: u.id,
+          companyId: companyToJoin.id,
+          role: 'member',
+          status: 'pending',
+        },
+      })
+    }
+
+    return NextResponse.json({ user: u }, { status: 201 })
   } catch (error) {
     console.error('Registration API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
