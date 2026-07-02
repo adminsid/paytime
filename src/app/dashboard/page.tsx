@@ -231,7 +231,12 @@ export default function DashboardPage() {
             {formatDuration(elapsed)}
           </div>
           {isOnBreak && (
-            <div className="mb-3 text-sm font-medium text-amber-600">⏸ On Break</div>
+            <div className="mb-3 flex items-center justify-center gap-1.5 text-sm font-medium text-amber-600">
+              <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+              </svg>
+              On Break
+            </div>
           )}
           <div className="mt-4">
             <input
@@ -249,20 +254,37 @@ export default function DashboardPage() {
             <button
               onClick={() => void toggleBreak()}
               disabled={loading}
-              className={`rounded-xl px-6 py-2.5 font-semibold text-white transition ${
+              className={`rounded-xl px-6 py-2.5 font-semibold text-white transition flex items-center gap-1.5 ${
                 isOnBreak
                   ? 'bg-blue-600 hover:bg-blue-700'
                   : 'bg-amber-500 hover:bg-amber-600'
               }`}
             >
-              {isOnBreak ? '▶ Resume' : '⏸ Break'}
+              {isOnBreak ? (
+                <>
+                  <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  Resume
+                </>
+              ) : (
+                <>
+                  <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                  </svg>
+                  Break
+                </>
+              )}
             </button>
             <button
               onClick={() => void stopTimer()}
               disabled={loading}
-              className="rounded-xl bg-red-500 px-6 py-2.5 font-semibold text-white transition hover:bg-red-600"
+              className="rounded-xl bg-red-500 px-6 py-2.5 font-semibold text-white transition hover:bg-red-600 flex items-center gap-1.5"
             >
-              ⏹ Stop
+              <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
+                <path d="M6 6h12v12H6z" />
+              </svg>
+              Stop
             </button>
           </div>
         </div>
@@ -272,10 +294,22 @@ export default function DashboardPage() {
 
           {companies.length === 0 ? (
             <div className="py-8 text-center text-gray-500">
-              <p className="mb-3 text-4xl">🏢</p>
+              <svg
+                className="mx-auto mb-3 h-12 w-12 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
+              </svg>
               <p className="font-medium">No companies yet</p>
-              <p className="mt-1 text-sm">
-                <Link href="/dashboard/companies" className="text-blue-600 hover:underline">
+              <p className="mt-1 text-sm text-gray-400">
+                <Link href="/dashboard/companies" className="text-blue-600 hover:underline font-medium">
                   Create or join a company
                 </Link>{' '}
                 to start tracking time
@@ -315,9 +349,12 @@ export default function DashboardPage() {
               <button
                 onClick={() => void startTimer()}
                 disabled={loading || !selectedCompany}
-                className="w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50"
+                className="w-full rounded-xl bg-blue-600 py-3 text-lg font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
               >
-                ▶ Start Timer
+                <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                Start Timer
               </button>
             </div>
           )}

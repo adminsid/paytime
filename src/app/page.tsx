@@ -73,17 +73,29 @@ export default async function Home() {
         <div className="mt-20 grid w-full max-w-4xl grid-cols-1 gap-8 md:grid-cols-3">
           {[
             {
-              icon: '⏱',
+              icon: (
+                <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              ),
               title: 'Simple Timer',
               desc: 'Start, pause, and stop your work timer with one click. Add descriptions to your sessions.',
             },
             {
-              icon: '🏢',
+              icon: (
+                <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              ),
               title: 'Multi-Company',
-              desc: 'Join multiple companies, get approved by admins, and set your hourly rate per company.',
+              desc: 'Join multiple companies, get approved by admins, and set your invite codes and rates.',
             },
             {
-              icon: '📄',
+              icon: (
+                <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              ),
               title: 'Auto Invoices',
               desc: 'Generate professional invoices from your time logs. Support for multiple currencies.',
             },
@@ -92,7 +104,7 @@ export default async function Home() {
               key={feature.title}
               className="rounded-2xl border border-gray-100 bg-white p-6 text-left shadow-sm"
             >
-              <div className="mb-3 text-3xl">{feature.icon}</div>
+              <div className="mb-4">{feature.icon}</div>
               <h3 className="mb-2 text-lg font-semibold text-gray-900">
                 {feature.title}
               </h3>

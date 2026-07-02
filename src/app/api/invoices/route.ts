@@ -14,16 +14,37 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const companyId = searchParams.get('companyId')
+  const userId = searchParams.get('userId')
 
-  const where: Prisma.InvoiceWhereInput = { userId: session.user.id }
+  const where: Prisma.InvoiceWhereInput = {}
+
   if (companyId) {
+    const member = await prisma.companyMember.findUnique({
+      where: { userId_companyId: { userId: session.user.id, companyId } },
+    })
+
+    if (!member || member.status !== 'approved') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
     where.companyId = companyId
+
+    if (member.role === 'admin') {
+      if (userId) {
+        where.userId = userId
+      }
+    } else {
+      where.userId = session.user.id
+    }
+  } else {
+    where.userId = session.user.id
   }
 
   const invoices = await prisma.invoice.findMany({
     where,
     include: {
       company: { select: { id: true, name: true } },
+      user: { select: { id: true, name: true, email: true } },
     },
     orderBy: { createdAt: 'desc' },
   })

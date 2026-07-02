@@ -11,15 +11,19 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { companyId } = await request.json()
-    if (!companyId) {
-      return NextResponse.json({ error: 'Company ID required' }, { status: 400 })
+    const { inviteCode } = await request.json()
+    if (!inviteCode?.trim()) {
+      return NextResponse.json({ error: 'Invite code required' }, { status: 400 })
     }
 
-    const company = await prisma.company.findUnique({ where: { id: companyId } })
+    const company = await prisma.company.findFirst({
+      where: { inviteCode: inviteCode.trim().toUpperCase() },
+    })
     if (!company) {
-      return NextResponse.json({ error: 'Company not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Company not found with this invite code' }, { status: 404 })
     }
+
+    const companyId = company.id
 
     const existing = await prisma.companyMember.findUnique({
       where: { userId_companyId: { userId: session.user.id, companyId } },

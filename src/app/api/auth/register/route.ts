@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password } = await request.json()
+    const { name, email, password, inviteCode } = await request.json()
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -19,14 +19,41 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    let companyToJoin = null
+    if (inviteCode) {
+      companyToJoin = await prisma.company.findFirst({
+        where: { inviteCode: inviteCode.trim().toUpperCase() },
+      })
+      if (!companyToJoin) {
+        return NextResponse.json({ error: 'Invalid company invite code' }, { status: 400 })
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 12)
-    const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword },
-      select: { id: true, name: true, email: true },
+
+    const user = await prisma.$transaction(async (tx) => {
+      const u = await tx.user.create({
+        data: { name, email, password: hashedPassword },
+        select: { id: true, name: true, email: true },
+      })
+
+      if (companyToJoin) {
+        await tx.companyMember.create({
+          data: {
+            userId: u.id,
+            companyId: companyToJoin.id,
+            role: 'member',
+            status: 'pending',
+          },
+        })
+      }
+
+      return u
     })
 
     return NextResponse.json({ user }, { status: 201 })
-  } catch {
+  } catch (error) {
+    console.error('Registration API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

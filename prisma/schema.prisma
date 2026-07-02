@@ -21,14 +21,16 @@ model User {
 }
 
 model Company {
-  id        String          @id @default(cuid())
-  name      String
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  id         String          @id @default(cuid())
+  name       String
+  inviteCode String?         @unique
+  isPremium  Boolean         @default(false)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
-  members   CompanyMember[]
-  timeLogs  TimeLog[]
-  invoices  Invoice[]
+  members    CompanyMember[]
+  timeLogs   TimeLog[]
+  invoices   Invoice[]
 }
 
 model CompanyMember {

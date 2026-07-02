@@ -17,16 +17,26 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
 
   const { id } = await params
 
-  const timeLog = await prisma.timeLog.findFirst({
-    where: { id, userId: session.user.id },
+  const timeLog = await prisma.timeLog.findUnique({
+    where: { id },
     include: { breaks: true },
   })
   if (!timeLog) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
+  const member = await prisma.companyMember.findUnique({
+    where: { userId_companyId: { userId: session.user.id, companyId: timeLog.companyId } },
+  })
+  const isOwner = timeLog.userId === session.user.id
+  const isAdmin = member && member.role === 'admin' && member.status === 'approved'
+
+  if (!isOwner && !isAdmin) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   try {
-    const { action, description } = await request.json()
+    const { action, description, startTime, endTime, totalBreakMinutes } = await request.json()
 
     if (action === 'stop') {
       const now = new Date()
@@ -46,6 +56,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         include: {
           breaks: true,
           company: { select: { id: true, name: true } },
+          user: { select: { id: true, name: true, email: true } },
         },
       })
       return NextResponse.json({ timeLog: updated })
@@ -69,6 +80,7 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         include: {
           breaks: true,
           company: { select: { id: true, name: true } },
+          user: { select: { id: true, name: true, email: true } },
         },
       })
       return NextResponse.json({ timeLog: updated })
@@ -89,18 +101,36 @@ export async function PATCH(request: NextRequest, { params }: RouteContext) {
         include: {
           breaks: true,
           company: { select: { id: true, name: true } },
+          user: { select: { id: true, name: true, email: true } },
         },
       })
       return NextResponse.json({ timeLog: updated })
     }
 
+    // Direct modifications (for editing time logs)
+    const updateData: any = {}
     if (description !== undefined) {
+      updateData.description = typeof description === 'string' ? description : ''
+    }
+    if (startTime !== undefined) {
+      updateData.startTime = new Date(startTime)
+    }
+    if (endTime !== undefined) {
+      updateData.endTime = endTime ? new Date(endTime) : null
+      updateData.isRunning = endTime ? false : timeLog.isRunning
+    }
+    if (totalBreakMinutes !== undefined) {
+      updateData.totalBreakMinutes = typeof totalBreakMinutes === 'number' ? totalBreakMinutes : (parseInt(totalBreakMinutes) || 0)
+    }
+
+    if (Object.keys(updateData).length > 0) {
       const updated = await prisma.timeLog.update({
         where: { id },
-        data: { description: typeof description === 'string' ? description : '' },
+        data: updateData,
         include: {
           breaks: true,
           company: { select: { id: true, name: true } },
+          user: { select: { id: true, name: true, email: true } },
         },
       })
       return NextResponse.json({ timeLog: updated })
@@ -120,11 +150,21 @@ export async function DELETE(_request: NextRequest, { params }: RouteContext) {
 
   const { id } = await params
 
-  const timeLog = await prisma.timeLog.findFirst({
-    where: { id, userId: session.user.id },
+  const timeLog = await prisma.timeLog.findUnique({
+    where: { id },
   })
   if (!timeLog) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
+  const member = await prisma.companyMember.findUnique({
+    where: { userId_companyId: { userId: session.user.id, companyId: timeLog.companyId } },
+  })
+  const isOwner = timeLog.userId === session.user.id
+  const isAdmin = member && member.role === 'admin' && member.status === 'approved'
+
+  if (!isOwner && !isAdmin) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
   await prisma.timeLog.delete({ where: { id } })
