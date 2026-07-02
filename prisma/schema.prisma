@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String          @id @default(cuid())
+  name        String
+  email       String          @unique
+  password    String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  memberships CompanyMember[]
+  timeLogs    TimeLog[]
+  invoices    Invoice[]
+}
+
+model Company {
+  id        String          @id @default(cuid())
+  name      String
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  members   CompanyMember[]
+  timeLogs  TimeLog[]
+  invoices  Invoice[]
+}
+
+model CompanyMember {
+  id         String   @id @default(cuid())
+  userId     String
+  companyId  String
+  role       String   @default("member")
+  status     String   @default("pending")
+  hourlyRate Float    @default(0)
+  currency   String   @default("USD")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId])
+}
+
+model TimeLog {
+  id                String   @id @default(cuid())
+  userId            String
+  companyId         String
+  description       String   @default("")
+  startTime         DateTime
+  endTime           DateTime?
+  isRunning         Boolean  @default(true)
+  totalBreakMinutes Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  breaks            Break[]
+}
+
+model Break {
+  id        String   @id @default(cuid())
+  timeLogId String
+  startTime DateTime
+  endTime   DateTime?
+  isRunning Boolean  @default(true)
+
+  timeLog   TimeLog   @relation(fields: [timeLogId], references: [id], onDelete: Cascade)
+}
+
+model Invoice {
+  id          String   @id @default(cuid())
+  userId      String
+  companyId   String
+  startDate   DateTime
+  endDate     DateTime
+  totalHours  Float
+  totalAmount Float
+  currency    String   @default("USD")
+  status      String   @default("draft")
+  notes       String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+}
