@@ -9,8 +9,14 @@
 	],
 	"vars": {
 		"NEXTAUTH_SECRET": "358e8749a941e17e805562149e836b76a084",
-		"NEXTAUTH_URL": "http://localhost:3000"
+		"NEXTAUTH_URL": "https://paytime.sakinxa.com"
 	},
+	"routes": [
+		{
+			"pattern": "paytime.sakinxa.com",
+			"custom_domain": true
+		}
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",
