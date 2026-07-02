@@ -1,0 +1,40 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"main": ".open-next/worker.js",
+	"name": "paytime",
+	"compatibility_date": "2026-07-02",
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	"vars": {
+		"NEXTAUTH_SECRET": "358e8749a941e17e805562149e836b76a084",
+		"NEXTAUTH_URL": "http://localhost:3000"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "paytime-db",
+			"database_id": "8ca274f7-477b-4bb8-a170-a5144892af87"
+		}
+	],
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
+	"services": [
+		{
+			"binding": "WORKER_SELF_REFERENCE",
+			"service": "paytime"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "NEXT_INC_CACHE_R2_BUCKET",
+			"bucket_name": "paytime-opennext-cache"
+		}
+	],
+	"images": {
+		"binding": "IMAGES"
+	}
+}
